@@ -1,0 +1,13 @@
+[Unit]
+Description=kafka_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart=/opt/kafka_exporter/kafka_exporter --kafka.server={{ansible_host}}:9092
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

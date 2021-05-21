@@ -1,0 +1,13 @@
+[Unit]
+Description=postgres_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart=sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" /opt/postgres_exporter/postgres_exporter 
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

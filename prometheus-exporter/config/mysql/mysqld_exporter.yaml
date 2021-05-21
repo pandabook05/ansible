@@ -1,0 +1,23 @@
+- name: 拷贝mysqld_exporter包
+  unarchive: 
+    src: config/mysql/mysqld_exporter-0.12.1.linux-amd64.tar.gz
+    dest: /opt/
+- name: 删除压缩包
+  file:
+    path: /opt/mysqld_exporter-0.12.1.linux-amd64.tar.gz
+    state: absent
+- name: 改名
+  shell: cd /opt && mv mysqld_exporter-0.12.1.linux-amd64     mysqld_exporter
+- copy:
+    src: config/mysql/my.conf
+    dest: /opt/mysqld_exporter/
+- name: 添加mysqld_exporter服务
+  copy: 
+    src: config/mysql/mysqld_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable mysqld_exporter.service
+- name: 启动服务
+  shell: systemctl start mysqld_exporter.service

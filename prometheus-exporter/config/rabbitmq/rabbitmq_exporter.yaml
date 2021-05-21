@@ -1,0 +1,27 @@
+- name: 注册rabbitmqctl路径到变量
+  shell: source /etc/profile && which rabbitmqctl
+  register: rabbitmqctl_path
+- name: 在rabbitmq主机上创建用户
+  shell: "{{ rabbitmqctl_path.stdout }} add_user monitor monitor_123 "
+- name: 授予集群监控权限
+  shell: "{{ rabbitmqctl_path.stdout }} set_user_tags monitor monitoring "
+- name: 拷贝rabbitmq_exporter包
+  unarchive: 
+    src: config/rabbitmq/rabbitmq_exporter-0.25.2.linux-amd64.tar.gz
+    dest: /opt/
+- name: 删除压缩包
+  file:
+    path: /opt/rabbitmq_exporter-0.25.2.linux-amd64.tar.gz
+    state: absent
+- name: 改名
+  shell: cd /opt && mv rabbitmq_exporter-0.25.2.linux-amd64     rabbitmq_exporter
+- name: 添加rabbitmq_exporter服务
+  template: 
+    src: config/rabbitmq/rabbitmq_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable rabbitmq_exporter.service
+- name: 启动服务
+  shell: systemctl start rabbitmq_exporter.service

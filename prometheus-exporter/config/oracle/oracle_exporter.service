@@ -1,0 +1,14 @@
+[Unit]
+Description=oracle_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+Environment=DATA_SOURCE_NAME="username/password@sid"
+User=root
+ExecStart=/opt/oracle_exporter/oracledb_exporter
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

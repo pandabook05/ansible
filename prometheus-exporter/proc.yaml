@@ -1,0 +1,103 @@
+---
+- hosts: kafkaa
+  user: root
+  gather_facts: true
+  tasks:
+  - name: 打印基本信息
+    debug:
+      msg: " ip is {{ ansible_all_ipv4_addresses[0] }},os is {{ ansible_distribution }} ,os_version is {{ ansible_distribution_major_version }}"
+  - name: 检测进程
+    #shell: "ps -ef |grep -v grep |grep -Ewo 'mysql|zookeeper|redis|kafka|elasticsearch|rocketmq|rabbitmq|nginx|mongodb|oracle|postgres'|sort -u"
+    shell: "ps -ef |grep -v grep |grep -Ewo 'kafka|mongodb'|sort -u"
+    register: process_list
+    ignore_errors: true
+  - name: 检测端口
+    shell: "netstat -nltp|grep -Ewo '3306|2181|6379|9092|9200|9876|25672|27017|1521|5432'|sort -u"
+    register: port_list
+    ignore_errors: true
+  - debug:
+      msg: "{{ process_list.stdout }}"
+      #msg: "{{ process_list.stdout|length }}"
+  - debug:
+      msg: "未检测到中间件"
+    when: process_list.stdout|length == 0
+  - block:
+    - name: 检测node_exporter端口
+      shell: "netstat -nltp|grep 9100"
+      register: node_exp_port
+      ignore_errors: true
+    - name: 安装node_exporter
+      import_tasks: config/node/node_exporter.yaml 
+      when: node_exp_port.stdout|length == 0
+  - block:
+    - name: 检测rocketmq_exporter端口
+      shell: "netstat -nltp|grep 5557"
+      register: rocketmq_exp_port
+      ignore_errors: true
+    - name: 安装rocketmq_exporter
+      import_tasks: config/rocketmq/rocketmq_exporter.yaml
+      when: rocketmq_exp_port.stdout|length == 0
+    when: '"rocketmq" in process_list.stdout'
+  - block:
+    - name: 检测mysqld_exporter端口
+      shell: "netstat -nltp|grep 9104"
+      register: mysqld_exp_port
+      ignore_errors: true
+    - name: 安装mysqld_exporter
+      import_tasks: config/mysql/mysqld_exporter.yaml
+      when: mysqld_exp_port.stdout|length == 0
+    when: '"mysql" in process_list.stdout'
+  - block:
+    - name: 检测redis_exporter端口
+      shell: "netstat -nltp|grep 9121"
+      register: redis_exp_port
+      ignore_errors: true
+    - name: 安装redis_exporter
+      import_tasks: config/redis/redis_exporter.yaml
+      when: redis_exp_port.stdout|length == 0
+    when: '"redis" in process_list.stdout'
+  - block:
+    - name: 检测mongodb_exporter端口
+      shell: "netstat -nltp|grep 9216"
+      register: mongodb_exp_port
+      ignore_errors: true
+    - name: 安装mongodb_exporter
+      import_tasks: config/mongodb/mongodb_exporter.yaml
+      when: mongodb_exp_port.stdout|length == 0
+    when: '"mongodb" in process_list.stdout'
+  - block:
+    - name: 检测oracle_exporter端口
+      shell: "netstat -nltp|grep 9161"
+      register: oracle_exp_port
+      ignore_errors: true
+    - name: 安装oracle_exporter
+      import_tasks: config/oracle/oracle_exporter.yaml
+      when: oracle_exp_port.stdout|length == 0
+    when: '"oracle" in process_list.stdout'
+  - block:
+    - name: 检测postgres_exporter端口
+      shell: "netstat -nltp|grep 9187"
+      register: postgres_exp_port
+      ignore_errors: true
+    - name: 安装postgres_exporter
+      import_tasks: config/postgres/postgres_exporter.yaml
+      when: postgres_exp_port.stdout|length == 0
+    when: '"postgres" in process_list.stdout'
+  - block:
+    - name: 检测kafka_exporter端口
+      shell: "netstat -nltp|grep 9308"
+      register: kafka_exp_port
+      ignore_errors: true
+    - name: 安装kafka_exporter
+      import_tasks: config/kafka/kafka_exporter.yaml
+      when: kafka_exp_port.stdout|length == 0
+    when: '"kafka" in process_list.stdout and "9092" in port_list.stdout'
+  - block:
+    - name: 检测rabbitmq_exporter端口
+      shell: "netstat -nltp|grep 9419"
+      register: rabbitmq_exp_port
+      ignore_errors: true
+    - name: 安装rabbitmq_exporter
+      import_tasks: config/rabbitmq/rabbitmq_exporter.yaml
+      when: rabbitmq_exp_port.stdout|length == 0
+    when: '"rabbitmq" in process_list.stdout'

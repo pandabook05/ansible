@@ -1,0 +1,21 @@
+- name: 创建rocketmq_exporter目录
+  file:
+    path: /opt/rocketmq_exporter
+    state: directory
+    mode: 0644
+- name: 拷贝rocketmq_exporter jar包
+  copy: 
+    src: config/rocketmq/rocketmq-exporter-0.0.2-SNAPSHOT.jar
+    dest: /opt/rocketmq_exporter
+- name: 注册java路径到systemctl文件中
+  shell: source /etc/profile && which java
+  register: java_path
+- template:
+    src: config/rocketmq/rocketmq_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable rocketmq_exporter.service 
+- name: 启动服务
+  shell: systemctl start rocketmq_exporter.service 

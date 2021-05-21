@@ -1,0 +1,14 @@
+[Unit]
+Description=rocketmq_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart={{java_path.stdout}} -jar /opt/rocketmq_exporter/rocketmq-exporter-0.0.2-SNAPSHOT.jar --rocketmq.config.namesrvAddr={{ansible_host}}:9876 
+#-rocketmq.config.rocketmqVersion=V4_5_2
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

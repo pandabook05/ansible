@@ -1,0 +1,13 @@
+[Unit]
+Description=mysql_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart=/opt/mysqld_exporter/mysqld_exporter  --config.my-cnf=/opt/mysqld_exporter/my.conf 
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

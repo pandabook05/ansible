@@ -1,0 +1,13 @@
+[Unit]
+Description=redis_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart=/opt/redis_exporter/redis_exporter -redis.addr=redis://{{ansible_host}}:7001 --redis.password=passwdxxxx --web.listen-address=:9121
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

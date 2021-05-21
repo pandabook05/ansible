@@ -1,0 +1,15 @@
+- name: 拷贝redis_exporter压缩包
+  unarchive: 
+    src: config/redis/redis_exporter-v1.15.1.linux-amd64.tar.gz
+    dest: /opt
+- name: 重命名目录
+  shell: cd /opt && mv redis_exporter-v1.15.1.linux-amd64 redis_exporter
+- template:
+    src: config/redis/redis_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable redis_exporter.service
+#- name: 启动服务
+#  shell: systemctl start redis_exporter.service

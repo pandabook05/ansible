@@ -1,0 +1,13 @@
+[Unit]
+Description=elasticsearch_exporter
+Documentation=https://prometheus.io/
+After=network.target
+[Service]
+
+Type=simple
+User=root
+ExecStart=/opt/elasticsearch_exporter/elasticsearch_exporter --web.listen-address=":9114" --es.uri http://{{ansible_host}}:9200
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+- name: 安装node_exporter
+  unarchive: src=config/node/node_exporter-1.0.1.linux-amd64.tar.gz dest=/opt/
+- name: change node exporter directory name
+  shell: mv /opt/node_exporter-1.0.1.linux-amd64/ /opt/node_exporter
+- name: 添加node_exporter服务
+  copy: 
+    src: config/node/node_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: delete_file
+  file:
+    path: /opt/node_exporter-1.0.1.linux-amd64.tar.gz
+    state: absent
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable node_exporter.service 
+- name: 启动服务
+  shell: systemctl start node_exporter.service 

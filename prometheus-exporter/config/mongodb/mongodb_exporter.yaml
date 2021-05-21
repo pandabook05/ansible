@@ -1,0 +1,22 @@
+- name: 创建mongodb_exporter目录
+  file:
+    path: /opt/mongodb_exporter
+    state: directory
+    mode: 0644
+- name: 拷贝mongodb_exporter包
+  unarchive: 
+    src: config/mongodb/mongodb_exporter-0.20.1.linux-amd64.tar.gz
+    dest: /opt/mongodb_exporter
+- name: 删除压缩包
+  file:
+    path: /opt/mongodb_exporter-0.20.1.linux-amd64.tar.gz
+    state: absent
+- template:
+    src: config/mongodb/mongodb_exporter.service
+    dest: /usr/lib/systemd/system/
+- name: service_reload
+  shell: systemctl daemon-reload
+- name: 设置开机自动启动
+  shell: systemctl enable mongodb_exporter.service 
+- name: 启动服务
+  shell: systemctl start mongodb_exporter.service
