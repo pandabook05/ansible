@@ -1,0 +1,10 @@
+mysql 3306    
+zookeeper  2181
+redis 6379
+kafka 9092
+elasticsearch  9200
+rocketmq 9876
+rabbitmq 25672
+mongodb 27017
+oracle 1521
+postgres 5432
